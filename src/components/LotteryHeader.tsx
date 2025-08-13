@@ -30,7 +30,7 @@ const LotteryHeader: React.FC<LotteryHeaderProps> = ({
           </div>
         <div className="text-center md:text-left">
           <h1 className="text-primary-contrast text-4xl md:text-5xl font-bold mb-2">
-            Sri Karunya Lottery
+            Sree Karunya Lottery
           </h1>
           <p className="text-muted-foreground text-lg">
             Today's Draw Results - {currentDate}

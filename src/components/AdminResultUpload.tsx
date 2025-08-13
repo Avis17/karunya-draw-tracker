@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const TIME_SLOTS = [
   '10:20',
-  '12:20', 
+  '12:20',
   '16:20',
   '18:20',
   '20:20'
@@ -31,8 +31,10 @@ const AdminResultUpload: React.FC<AdminResultUploadProps> = ({ onBack }) => {
 
   const fetchExistingResults = async (date: Date) => {
     try {
-      const dateStr = date.toISOString().split('T')[0];
-      
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
       const { data, error } = await supabase
         .from('lottery_results')
         .select('*')
@@ -45,7 +47,7 @@ const AdminResultUpload: React.FC<AdminResultUploadProps> = ({ onBack }) => {
       }
 
       setExistingResults(data || []);
-      
+
       // Populate form with existing results
       const existingResultsMap: Record<string, string> = {};
       data?.forEach(result => {
@@ -73,7 +75,7 @@ const AdminResultUpload: React.FC<AdminResultUploadProps> = ({ onBack }) => {
 
   const handleSaveResult = async (timeSlot: string) => {
     const resultNumber = results[timeSlot];
-    
+
     if (!resultNumber || resultNumber.length !== 6) {
       toast({
         title: "Invalid Result",
@@ -85,11 +87,15 @@ const AdminResultUpload: React.FC<AdminResultUploadProps> = ({ onBack }) => {
 
     try {
       setLoading(true);
-      const dateStr = selectedDate.toISOString().split('T')[0];
-      
+      // const dateStr = selectedDate.toISOString().split('T')[0];
+       const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+
       // Check if result already exists
       const existingResult = existingResults.find(r => r.slot_time === timeSlot);
-      
+
       if (existingResult) {
         // Update existing result
         const { error } = await supabase
@@ -98,7 +104,7 @@ const AdminResultUpload: React.FC<AdminResultUploadProps> = ({ onBack }) => {
           .eq('id', existingResult.id);
 
         if (error) throw error;
-        
+
         toast({
           title: "Success",
           description: `Result updated for ${timeSlot}`,
@@ -114,13 +120,13 @@ const AdminResultUpload: React.FC<AdminResultUploadProps> = ({ onBack }) => {
           });
 
         if (error) throw error;
-        
+
         toast({
           title: "Success",
           description: `Result saved for ${timeSlot}`,
         });
       }
-      
+
       // Refresh existing results
       await fetchExistingResults(selectedDate);
     } catch (error) {
@@ -137,31 +143,31 @@ const AdminResultUpload: React.FC<AdminResultUploadProps> = ({ onBack }) => {
 
   const handleDeleteResult = async (timeSlot: string) => {
     const existingResult = existingResults.find(r => r.slot_time === timeSlot);
-    
+
     if (!existingResult) return;
 
     try {
       setLoading(true);
-      
+
       const { error } = await supabase
         .from('lottery_results')
         .delete()
         .eq('id', existingResult.id);
 
       if (error) throw error;
-      
+
       toast({
         title: "Success",
         description: `Result deleted for ${timeSlot}`,
       });
-      
+
       // Clear from local state
       setResults(prev => {
         const newResults = { ...prev };
         delete newResults[timeSlot];
         return newResults;
       });
-      
+
       // Refresh existing results
       await fetchExistingResults(selectedDate);
     } catch (error) {
@@ -213,7 +219,7 @@ const AdminResultUpload: React.FC<AdminResultUploadProps> = ({ onBack }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {TIME_SLOTS.map((timeSlot) => {
             const hasExistingResult = existingResults.some(r => r.slot_time === timeSlot);
-            
+
             return (
               <Card key={timeSlot}>
                 <CardHeader>
@@ -231,7 +237,7 @@ const AdminResultUpload: React.FC<AdminResultUploadProps> = ({ onBack }) => {
                       className="text-center text-lg font-mono"
                     />
                   </div>
-                  
+
                   <div className="flex gap-2">
                     <Button
                       onClick={() => handleSaveResult(timeSlot)}
@@ -241,7 +247,7 @@ const AdminResultUpload: React.FC<AdminResultUploadProps> = ({ onBack }) => {
                       <Save className="w-4 h-4 mr-2" />
                       {hasExistingResult ? 'Update' : 'Save'}
                     </Button>
-                    
+
                     {hasExistingResult && (
                       <Button
                         onClick={() => handleDeleteResult(timeSlot)}
@@ -253,7 +259,7 @@ const AdminResultUpload: React.FC<AdminResultUploadProps> = ({ onBack }) => {
                       </Button>
                     )}
                   </div>
-                  
+
                   {hasExistingResult && (
                     <p className="text-sm text-muted-foreground">
                       Status: Result exists
