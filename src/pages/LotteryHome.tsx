@@ -3,7 +3,6 @@ import LotteryHeader from '@/components/LotteryHeader';
 import TimeSlot from '@/components/TimeSlot';
 import ResultDigits from '@/components/ResultDigits';
 import { useLotteryResults } from '@/hooks/useLotteryResults';
-import keralaArtLogo from '@/assets/kerala-art-logo.png';
 
 interface LotteryHomeProps {
   onViewResults: () => void;
@@ -82,17 +81,6 @@ const LotteryHome: React.FC<LotteryHomeProps> = ({ onViewResults, onAdminLogin }
                   />
                 );
               })}
-            </div>
-          </div>
-          
-          {/* Kerala Art Logo */}
-          <div className="hidden lg:block">
-            <div className="lottery-card p-4">
-              <img 
-                src={keralaArtLogo} 
-                alt="Kerala Traditional Art" 
-                className="w-48 h-48 object-contain"
-              />
             </div>
           </div>
         </div>

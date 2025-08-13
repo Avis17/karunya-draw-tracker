@@ -28,7 +28,7 @@ const ResultDigits: React.FC<ResultDigitsProps> = ({ result, showPending = true 
   }
 
   // Ensure result is exactly 5 digits
-  const digits = result.padStart(5, '0').split('').slice(0, 5);
+  const digits = result.padStart(6, '0').split('').slice(0, 6);
 
   return (
     <div className="flex gap-2 justify-center">

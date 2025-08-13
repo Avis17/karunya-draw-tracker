@@ -1,6 +1,7 @@
 import React from 'react';
 import { Calendar, History, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import keralaArtLogo from '@/assets/kerala-art-logo.png';
 
 interface LotteryHeaderProps {
   onViewResults: () => void;
@@ -15,7 +16,18 @@ const LotteryHeader: React.FC<LotteryHeaderProps> = ({
 }) => {
   return (
     <header className="lottery-card p-6 mb-8">
+     
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+         {/* Kerala Art Logo */}
+          <div className="hidden lg:block">
+            <div className="lottery-card p-4">
+              <img 
+                src={keralaArtLogo} 
+                alt="Kerala Traditional Art" 
+                className="w-48 h-48 object-contain"
+              />
+            </div>
+          </div>
         <div className="text-center md:text-left">
           <h1 className="text-primary-contrast text-4xl md:text-5xl font-bold mb-2">
             Sri Karunya Lottery

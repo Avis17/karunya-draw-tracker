@@ -33,7 +33,7 @@ const TimeSlot: React.FC<TimeSlotProps> = ({ time, result, isActive, onClick }) 
             {result}
           </div>
         ) : (
-          <div className="text-6xl font-bold text-white/60">-</div>
+          <div className="text-6xl font-bold">---</div>
         )}
       </div>
     </div>
