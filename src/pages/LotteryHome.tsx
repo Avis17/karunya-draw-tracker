@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import LotteryHeader from '@/components/LotteryHeader';
 import TimeSlot from '@/components/TimeSlot';
+import ResultDigits from '@/components/ResultDigits';
 import { useLotteryResults } from '@/hooks/useLotteryResults';
+import keralaArtLogo from '@/assets/kerala-art-logo.png';
 
 interface LotteryHomeProps {
   onViewResults: () => void;
@@ -27,7 +29,7 @@ const LotteryHome: React.FC<LotteryHomeProps> = ({ onViewResults, onAdminLogin }
     return date;
   }, []);
   
-  const { getResultForTime, isTimeSlotActive } = useLotteryResults(today);
+  const { getResultForTime, isTimeSlotActive, shouldShowResult } = useLotteryResults(today);
   const { 
     getResultForTime: getYesterdayResultForTime,
     results: yesterdayResults 
@@ -62,21 +64,36 @@ const LotteryHome: React.FC<LotteryHomeProps> = ({ onViewResults, onAdminLogin }
           currentDate={currentDate}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          {TIME_SLOTS.map((time) => {
-            const isActive = isTimeSlotActive(time);
-            const result = isActive ? getResultForTime(time) : null;
-            
-            return (
-              <TimeSlot
-                key={time}
-                time={time}
-                result={result}
-                isActive={isActive}
-                onClick={() => handleSlotClick(time)}
+        <div className="flex items-start gap-8">
+          <div className="flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {TIME_SLOTS.map((time) => {
+                const isActive = isTimeSlotActive(time);
+                const result = shouldShowResult(time) ? getResultForTime(time) : null;
+                
+                return (
+                  <TimeSlot
+                    key={time}
+                    time={time}
+                    result={result}
+                    isActive={isActive}
+                    onClick={() => handleSlotClick(time)}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          
+          {/* Kerala Art Logo */}
+          <div className="hidden lg:block">
+            <div className="lottery-card p-4">
+              <img 
+                src={keralaArtLogo} 
+                alt="Kerala Traditional Art" 
+                className="w-48 h-48 object-contain"
               />
-            );
-          })}
+            </div>
+          </div>
         </div>
 
         {selectedSlot && isTimeSlotActive(selectedSlot) && (
@@ -95,46 +112,44 @@ const LotteryHome: React.FC<LotteryHomeProps> = ({ onViewResults, onAdminLogin }
           </div>
         )}
 
-        {/* Previous Day Results */}
-        {yesterdayResults.length > 0 && (
-          <div className="mt-12">
-            <div className="lottery-card p-6 mb-6">
-              <h2 className="text-3xl font-bold text-center text-primary-contrast mb-2">
-                Previous Day Results
-              </h2>
-              <p className="text-center text-muted-foreground text-lg">
-                {yesterdayDate}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-              {TIME_SLOTS.map((time) => {
-                const result = getYesterdayResultForTime(time);
-                
-                return (
-                  <div
-                    key={`yesterday-${time}`}
-                    className="time-slot time-slot-active opacity-75"
-                  >
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                      <span className="font-bold">{time.split(':').map((part, i) => i === 0 ? (parseInt(part) % 12 || 12) : part).join(':')} {parseInt(time.split(':')[0]) >= 12 ? 'PM' : 'AM'}</span>
-                    </div>
-                    
-                    <div className="bg-white/20 rounded-lg p-4 min-h-[80px] flex items-center justify-center">
-                      {result ? (
-                        <div className="result-number text-primary-foreground">
-                          {result}
-                        </div>
-                      ) : (
-                        <div className="text-6xl font-bold text-white/60">-</div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+        {/* Previous Day Results - Always Show */}
+        <div className="mt-12">
+          <div className="lottery-card p-6 mb-6">
+            <h2 className="text-3xl font-bold text-center text-primary-contrast mb-2">
+              Previous Day Results
+            </h2>
+            <p className="text-center text-muted-foreground text-lg">
+              {yesterdayDate}
+            </p>
           </div>
-        )}
+
+          <div className="space-y-8">
+            {TIME_SLOTS.map((time) => {
+              const result = getYesterdayResultForTime(time);
+              const formatTime = (timeStr: string) => {
+                const [hours, minutes] = timeStr.split(':');
+                const hour = parseInt(hours);
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                const displayHour = hour % 12 || 12;
+                return `${displayHour}:${minutes} ${ampm}`;
+              };
+              
+              return (
+                <div key={`yesterday-${time}`} className="lottery-card p-6">
+                  <h3 className="text-xl font-bold text-center mb-4 text-primary">
+                    Result for {formatTime(time)}:
+                  </h3>
+                  <ResultDigits result={result} showPending={false} />
+                  {!result && (
+                    <p className="text-center text-muted-foreground mt-3 text-sm">
+                      Result not available for this time slot
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

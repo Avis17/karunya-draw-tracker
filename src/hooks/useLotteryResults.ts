@@ -78,6 +78,23 @@ export const useLotteryResults = (selectedDate?: Date) => {
     return now >= slotTime;
   };
 
+  const shouldShowResult = (time: string): boolean => {
+    if (!selectedDate) return false;
+    
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const targetDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+    
+    // For past dates, always show results if they exist
+    if (targetDate < today) return true;
+    
+    // For future dates, never show results
+    if (targetDate > today) return false;
+    
+    // For today, only show results if the slot time has passed
+    return isTimeSlotActive(time);
+  };
+
   useEffect(() => {
     if (selectedDate) {
       fetchResults(selectedDate);
@@ -90,6 +107,7 @@ export const useLotteryResults = (selectedDate?: Date) => {
     fetchResults,
     getResultForTime,
     isTimeSlotActive,
+    shouldShowResult,
     refetch: () => selectedDate && fetchResults(selectedDate)
   };
 };

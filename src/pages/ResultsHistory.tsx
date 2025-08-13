@@ -22,7 +22,7 @@ const TIME_SLOTS = [
 
 const ResultsHistory: React.FC<ResultsHistoryProps> = ({ onBack }) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const { results, loading, getResultForTime } = useLotteryResults(selectedDate);
+  const { results, loading, getResultForTime, shouldShowResult } = useLotteryResults(selectedDate);
 
   const handleDateSelect = (date: Date | undefined) => {
     if (date && date <= new Date()) {
@@ -102,7 +102,7 @@ const ResultsHistory: React.FC<ResultsHistoryProps> = ({ onBack }) => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {TIME_SLOTS.map((time) => {
-                  const result = getResultForTime(time);
+                  const result = shouldShowResult(time) ? getResultForTime(time) : null;
                   
                   return (
                     <TimeSlot
