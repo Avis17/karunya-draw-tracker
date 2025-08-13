@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import LotteryHeader from '@/components/LotteryHeader';
 import TimeSlot from '@/components/TimeSlot';
 import { useLotteryResults } from '@/hooks/useLotteryResults';
@@ -18,9 +18,14 @@ const TIME_SLOTS = [
 
 const LotteryHome: React.FC<LotteryHomeProps> = ({ onViewResults, onAdminLogin }) => {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
+  
+  // Memoize dates to prevent infinite re-renders
+  const today = useMemo(() => new Date(), []);
+  const yesterday = useMemo(() => {
+    const date = new Date();
+    date.setDate(date.getDate() - 1);
+    return date;
+  }, []);
   
   const { getResultForTime, isTimeSlotActive } = useLotteryResults(today);
   const { 
