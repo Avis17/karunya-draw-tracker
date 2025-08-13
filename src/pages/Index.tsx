@@ -10,31 +10,10 @@ type View = 'home' | 'results' | 'admin-auth' | 'admin-dashboard';
 const Index = () => {
   const [currentView, setCurrentView] = useState<View>('home');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // Check authentication status
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
-      setLoading(false);
-    };
-
-    checkAuth();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setIsAuthenticated(!!session);
-        
-        if (event === 'SIGNED_OUT') {
-          setCurrentView('home');
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
+  // For admin authentication, we'll use a simple state approach
+  // since admin_users is a separate table
 
   const handleViewChange = (view: View) => {
     setCurrentView(view);
@@ -52,7 +31,13 @@ const Index = () => {
   };
 
   const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
     setCurrentView('admin-dashboard');
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setCurrentView('home');
   };
 
   if (loading) {
@@ -77,7 +62,7 @@ const Index = () => {
   }
 
   if (currentView === 'admin-dashboard' && isAuthenticated) {
-    return <AdminDashboard onLogout={() => handleViewChange('home')} />;
+    return <AdminDashboard onLogout={handleLogout} />;
   }
 
   return (
