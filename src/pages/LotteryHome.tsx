@@ -70,12 +70,13 @@ const LotteryHome: React.FC<LotteryHomeProps> = ({ onViewResults, onAdminLogin }
               {TIME_SLOTS.map((time) => {
                 const isActive = isTimeSlotActive(time);
                 const result = shouldShowResult(time) ? getResultForTime(time) : null;
+                const displayResult = isActive && !result ? '******' : result;
                 
                 return (
                   <TimeSlot
                     key={time}
                     time={time}
-                    result={result}
+                    result={displayResult}
                     isActive={isActive}
                     onClick={() => handleSlotClick(time)}
                   />

@@ -15,9 +15,9 @@ interface ResultsHistoryProps {
 const TIME_SLOTS = [
   '10:20',
   '12:20', 
-  '14:20',
   '16:20',
-  '18:20'
+  '18:20',
+  '20:20'
 ];
 
 const ResultsHistory: React.FC<ResultsHistoryProps> = ({ onBack }) => {
