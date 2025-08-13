@@ -102,10 +102,11 @@ const LotteryHome: React.FC<LotteryHomeProps> = ({ onViewResults, onAdminLogin }
               Result Details - {selectedSlot}
             </h3>
             <div className="text-center">
-              <div className="result-number text-primary mb-2">
-                {getResultForTime(selectedSlot) || 'Result Pending'}
-              </div>
-              <p className="text-muted-foreground">
+              <ResultDigits 
+                result={getResultForTime(selectedSlot)} 
+                showPending={true}
+              />
+              <p className="text-muted-foreground mt-4">
                 Draw Date: {currentDate}
               </p>
             </div>

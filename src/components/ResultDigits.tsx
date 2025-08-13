@@ -15,11 +15,11 @@ const ResultDigits: React.FC<ResultDigitsProps> = ({ result, showPending = true 
             className="w-12 h-12 md:w-16 md:h-16 bg-gradient-subtle border-2 border-accent/30 rounded-lg flex items-center justify-center"
           >
             {showPending ? (
-              <span className="text-xs md:text-sm text-muted-foreground font-medium">
+              <span className="text-lg md:text-xl text-foreground/60 font-bold">
                 -
               </span>
             ) : (
-              <div className="w-2 h-2 bg-muted-foreground/30 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-foreground/30 rounded-full animate-pulse"></div>
             )}
           </div>
         ))}
