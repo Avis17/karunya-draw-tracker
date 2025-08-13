@@ -32,65 +32,31 @@ const AdminAuth: React.FC<AdminAuthProps> = ({ onBack, onLoginSuccess }) => {
 
     setLoading(true);
     try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/`
-          }
-        });
+      // Simple username/password check against admin_users table
+      const { data: adminUser, error } = await supabase
+        .from('admin_users')
+        .select('*')
+        .eq('username', email) // Using email field as username
+        .eq('password_hash', password) // Simple password check (in production, use proper hashing)
+        .single();
 
-        if (error) {
-          toast({
-            title: "Sign Up Error",
-            description: error.message,
-            variant: "destructive"
-          });
-          return;
-        }
-
-        // Create profile with admin role
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              user_id: (await supabase.auth.getUser()).data.user?.id,
-              email,
-              role: 'admin'
-            }
-          ]);
-
-        if (profileError) {
-          console.error('Profile creation error:', profileError);
-        }
-
+      if (error || !adminUser) {
         toast({
-          title: "Success",
-          description: "Admin account created successfully!",
+          title: "Login Error",
+          description: "Invalid username or password",
+          variant: "destructive"
         });
-        onLoginSuccess();
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) {
-          toast({
-            title: "Login Error", 
-            description: error.message,
-            variant: "destructive"
-          });
-          return;
-        }
-
-        toast({
-          title: "Success",
-          description: "Logged in successfully!",
-        });
-        onLoginSuccess();
+        return;
       }
+
+      // Store admin session in localStorage
+      localStorage.setItem('adminUser', JSON.stringify(adminUser));
+
+      toast({
+        title: "Success",
+        description: "Logged in successfully!",
+      });
+      onLoginSuccess();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -114,20 +80,20 @@ const AdminAuth: React.FC<AdminAuthProps> = ({ onBack, onLoginSuccess }) => {
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <h1 className="text-2xl font-bold text-gradient-primary">
-              Admin {isSignUp ? 'Sign Up' : 'Login'}
+            <h1 className="text-2xl font-bold text-primary-contrast">
+              Admin Login
             </h1>
           </div>
 
           <form onSubmit={handleAuth} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Username</Label>
               <Input
                 id="email"
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter admin email"
+                placeholder="Enter username"
                 required
               />
             </div>
@@ -160,19 +126,8 @@ const AdminAuth: React.FC<AdminAuthProps> = ({ onBack, onLoginSuccess }) => {
               className="w-full gradient-primary"
               disabled={loading}
             >
-              {loading ? "Please wait..." : isSignUp ? "Create Admin Account" : "Login"}
+              {loading ? "Please wait..." : "Login"}
             </Button>
-
-            <div className="text-center">
-              <Button
-                type="button"
-                variant="link"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-sm"
-              >
-                {isSignUp ? "Already have an account? Login" : "Need to create an admin account? Sign Up"}
-              </Button>
-            </div>
           </form>
         </div>
       </div>

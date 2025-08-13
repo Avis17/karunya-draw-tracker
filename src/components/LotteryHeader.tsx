@@ -17,7 +17,7 @@ const LotteryHeader: React.FC<LotteryHeaderProps> = ({
     <header className="lottery-card p-6 mb-8">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="text-center md:text-left">
-          <h1 className="text-gradient-primary text-4xl md:text-5xl font-bold mb-2">
+          <h1 className="text-primary-contrast text-4xl md:text-5xl font-bold mb-2">
             Sri Karunya Lottery
           </h1>
           <p className="text-muted-foreground text-lg">
