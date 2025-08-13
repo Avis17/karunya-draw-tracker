@@ -50,7 +50,11 @@ export const useLotteryResults = (selectedDate?: Date) => {
   };
 
   const getResultForTime = (time: string): string | null => {
-    const result = results.find(r => r.slot_time === time);
+    // Handle both "10:20" and "10:20:00" formats
+    const result = results.find(r => {
+      const slotTime = r.slot_time.substring(0, 5); // Extract HH:MM from HH:MM:SS
+      return slotTime === time;
+    });
     return result?.result_number || null;
   };
 

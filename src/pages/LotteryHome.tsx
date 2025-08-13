@@ -19,9 +19,23 @@ const TIME_SLOTS = [
 const LotteryHome: React.FC<LotteryHomeProps> = ({ onViewResults, onAdminLogin }) => {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
   const { getResultForTime, isTimeSlotActive } = useLotteryResults(today);
+  const { 
+    getResultForTime: getYesterdayResultForTime,
+    results: yesterdayResults 
+  } = useLotteryResults(yesterday);
 
   const currentDate = today.toLocaleDateString('en-IN', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  const yesterdayDate = yesterday.toLocaleDateString('en-IN', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -72,6 +86,47 @@ const LotteryHome: React.FC<LotteryHomeProps> = ({ onViewResults, onAdminLogin }
               <p className="text-muted-foreground">
                 Draw Date: {currentDate}
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Previous Day Results */}
+        {yesterdayResults.length > 0 && (
+          <div className="mt-12">
+            <div className="lottery-card p-6 mb-6">
+              <h2 className="text-3xl font-bold text-center text-primary-contrast mb-2">
+                Previous Day Results
+              </h2>
+              <p className="text-center text-muted-foreground text-lg">
+                {yesterdayDate}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {TIME_SLOTS.map((time) => {
+                const result = getYesterdayResultForTime(time);
+                
+                return (
+                  <div
+                    key={`yesterday-${time}`}
+                    className="time-slot time-slot-active opacity-75"
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <span className="font-bold">{time.split(':').map((part, i) => i === 0 ? (parseInt(part) % 12 || 12) : part).join(':')} {parseInt(time.split(':')[0]) >= 12 ? 'PM' : 'AM'}</span>
+                    </div>
+                    
+                    <div className="bg-white/20 rounded-lg p-4 min-h-[80px] flex items-center justify-center">
+                      {result ? (
+                        <div className="result-number text-primary-foreground">
+                          {result}
+                        </div>
+                      ) : (
+                        <div className="text-6xl font-bold text-white/60">-</div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
